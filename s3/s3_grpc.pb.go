@@ -24,6 +24,7 @@ const (
 	Endpoint_UnregisterBucket_FullMethodName   = "/s3.Endpoint/UnregisterBucket"
 	Endpoint_GetAllBuckets_FullMethodName      = "/s3.Endpoint/GetAllBuckets"
 	Endpoint_CreateImage_FullMethodName        = "/s3.Endpoint/CreateImage"
+	Endpoint_CreateImageUrl_FullMethodName     = "/s3.Endpoint/CreateImageUrl"
 	Endpoint_GetImage_FullMethodName           = "/s3.Endpoint/GetImage"
 	Endpoint_GetImageWithBucket_FullMethodName = "/s3.Endpoint/GetImageWithBucket"
 	Endpoint_DeleteImage_FullMethodName        = "/s3.Endpoint/DeleteImage"
@@ -40,6 +41,7 @@ type EndpointClient interface {
 	UnregisterBucket(ctx context.Context, in *UnregisterBucketRequest, opts ...grpc.CallOption) (*CommonResponse, error)
 	GetAllBuckets(ctx context.Context, in *GetAllBucketsRequest, opts ...grpc.CallOption) (*GetAllBucketsResponse, error)
 	CreateImage(ctx context.Context, in *CreateImageRequest, opts ...grpc.CallOption) (*CreateImageResponse, error)
+	CreateImageUrl(ctx context.Context, in *CreateImageUrlRequest, opts ...grpc.CallOption) (*CreateImageResponse, error)
 	GetImage(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*GetImageResponse, error)
 	GetImageWithBucket(ctx context.Context, in *GetImageWithBucketRequest, opts ...grpc.CallOption) (*GetImageWithBucketResponse, error)
 	DeleteImage(ctx context.Context, in *DeleteImageRequest, opts ...grpc.CallOption) (*CommonResponse, error)
@@ -105,6 +107,16 @@ func (c *endpointClient) CreateImage(ctx context.Context, in *CreateImageRequest
 	return out, nil
 }
 
+func (c *endpointClient) CreateImageUrl(ctx context.Context, in *CreateImageUrlRequest, opts ...grpc.CallOption) (*CreateImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateImageResponse)
+	err := c.cc.Invoke(ctx, Endpoint_CreateImageUrl_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *endpointClient) GetImage(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*GetImageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetImageResponse)
@@ -164,6 +176,7 @@ type EndpointServer interface {
 	UnregisterBucket(context.Context, *UnregisterBucketRequest) (*CommonResponse, error)
 	GetAllBuckets(context.Context, *GetAllBucketsRequest) (*GetAllBucketsResponse, error)
 	CreateImage(context.Context, *CreateImageRequest) (*CreateImageResponse, error)
+	CreateImageUrl(context.Context, *CreateImageUrlRequest) (*CreateImageResponse, error)
 	GetImage(context.Context, *GetImageRequest) (*GetImageResponse, error)
 	GetImageWithBucket(context.Context, *GetImageWithBucketRequest) (*GetImageWithBucketResponse, error)
 	DeleteImage(context.Context, *DeleteImageRequest) (*CommonResponse, error)
@@ -193,6 +206,9 @@ func (UnimplementedEndpointServer) GetAllBuckets(context.Context, *GetAllBuckets
 }
 func (UnimplementedEndpointServer) CreateImage(context.Context, *CreateImageRequest) (*CreateImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateImage not implemented")
+}
+func (UnimplementedEndpointServer) CreateImageUrl(context.Context, *CreateImageUrlRequest) (*CreateImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateImageUrl not implemented")
 }
 func (UnimplementedEndpointServer) GetImage(context.Context, *GetImageRequest) (*GetImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetImage not implemented")
@@ -320,6 +336,24 @@ func _Endpoint_CreateImage_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Endpoint_CreateImageUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateImageUrlRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EndpointServer).CreateImageUrl(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Endpoint_CreateImageUrl_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EndpointServer).CreateImageUrl(ctx, req.(*CreateImageUrlRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Endpoint_GetImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetImageRequest)
 	if err := dec(in); err != nil {
@@ -436,6 +470,10 @@ var Endpoint_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateImage",
 			Handler:    _Endpoint_CreateImage_Handler,
+		},
+		{
+			MethodName: "CreateImageUrl",
+			Handler:    _Endpoint_CreateImageUrl_Handler,
 		},
 		{
 			MethodName: "GetImage",
